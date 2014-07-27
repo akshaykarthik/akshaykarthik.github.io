@@ -1,0 +1,24 @@
+# Dependencies
+markdown:         redcarpet
+highlighter:      pygments
+
+# Permalinks
+permalink:        pretty
+
+# Setup
+title:            Akshay Karthik
+tagline:          'Personal Blog/Portfolio'
+description:      'This is a blog/portfolio'
+url:              http://akshaykarthik.github.io
+
+author:
+  name:           'Akshay Karthik'
+  url:            http://akshaykarthik.github.io
+
+paginate:         10
+
+# Custom vars
+version:          1.0.0
+
+pages_list:
+  # Tags: '/tags.html'
