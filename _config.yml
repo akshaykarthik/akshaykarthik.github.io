@@ -9,9 +9,3 @@ username: akshaykarthik
 # Build settings
 markdown: kramdown
 permalink: pretty
-
-sitepages:
-	- name: about
-	  url: about.html
-	- name: feed
-	  url: feed.xml
