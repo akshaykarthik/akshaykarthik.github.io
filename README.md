@@ -1,2 +1,0 @@
-akshaykarthik.github.io
-=======================
