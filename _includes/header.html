@@ -1,0 +1,12 @@
+<header class="site-header">
+<div class="header-menu">
+    <h1><a href="#" class="header-heading">{{ site.title }}</a></h1>
+    <ul>
+        {% for page in site.sitepages %}
+          <li>
+            <a class="header-section" href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a>
+          </li>
+        {% endfor %}
+    </ul>
+</div>
+</header>
