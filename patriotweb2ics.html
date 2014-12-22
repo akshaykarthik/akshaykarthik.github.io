@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<title>Patriotweb2ICS - akshaykarthik</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="public/normalize.css">
+<link rel="stylesheet" href="public/skeleton.css">
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="column" style="margin-top: 25%">
+            <h4>Patriotweb2ICS - by <a href="http://akshaykarthik.com">Akshay Karthik</a></h4>
+            <p>This is a simple tool that I wrote for myself to automatically convert the patriotweb course-schedule table into something that google calendar understands.</p>
+            <hr>
+            <p>Let's start with where you get the information from patriotweb.<p>
+            <p>After you log in to patriotweb, go to "Registration"</p>
+            <p>Go into "Student Schedule" and select the appropriate term</p>
+            <p>Copy all of the table except the last row<p>
+        </div>
+    </div>
+    <form id="inputFromPW">
+        <div class="row column">
+            <label for="inputTable">Paste it into the box below</label>
+            <textArea class="u-full-width" placeholder="Paste your table here" id="inputTable"></textarea>
+            <input type="submit" value="Process">
+        </div>
+    </form>
+    <div class="row column" id="resultDiv"></div>
+</div>
+<script>
+$(document).ready(function(){
+    $("#inputFromPW").submit(function(event){
+        var icsOut = ""+
+            "BEGIN:VCALENDAR\n" +
+            "PRODID:-//akshaykarthik//patriotweb2ics//EN\n" +
+            "VERSION:2.0\n" +
+            "CALSCALE:GREGORIAN\n" +
+            "METHOD:PUBLISH\n";
+
+        var text = $("#inputTable").val();
+        var lines = text.split("\n");
+        lines.forEach(function(classLine){
+            var classLineParts = classLine.split("\t");
+            if(classLineParts.length < 12){
+                return;
+            }
+            
+            // crn doesn't really matter but it provides a good uid for the
+            // calendar event
+            var crn = classLineParts[0];
+
+            // these 4 are used for the names and descriptions
+            // we are ignoring campus, ug/pg marker, and credits 
+            var name = classLineParts[1];
+            var fullName = classLineParts[2];
+            var classLocation = classLineParts[10];
+            var professor = classLineParts[11];
+
+            // convert from one to two character segments
+            var replaceMap = {
+                "M": "MO",
+                "T": "TU",
+                "W": "WE",
+                "R": "TH",
+                "F": "FR", "S": "SA"
+            };
+            var weekParts = classLineParts[8].split("").map(function(item){
+              return replaceMap[item];  
+            }).join(",");
+
+            // need to be very careful handling dates
+            var startDateString = (classLineParts[6]);
+            var endDateString = (classLineParts[7]);
+
+            // the replication here should ideally be split up but it personally
+            // helps me keep track of everything in my head
+            var startTime = startDateString + " " + classLineParts[9].split("-")[0].trim();
+            var endTime = startDateString + " " + classLineParts[9].split("-")[1].trim();
+            var repeatEndTime = endDateString + " " + classLineParts[9].split("-")[1].trim(); 
+            var startDateMoment = moment(startTime, "MMM D, YYYY h:mm a");
+            var endDateMoment = moment(endTime, "MMM D, YYYY h:mm a");
+            var endRepeatMoment = moment(repeatEndTime, "MMM D, YYYY h:mm a");
+
+            var classLine = [
+                "BEGIN:VEVENT",
+                "UID:" + crn,
+                "DTSTART;VALUE=DATE:" + startDateMoment.format("YYYYMMDD[T]HHmmss"),
+                "DTEND;VALUE=DATE:" + endDateMoment.format("YYYYMMDD[T]HHmmss"),
+                "RRULE:FREQ=WEEKLY;UNTIL=" + endRepeatMoment.format("YYYYMMDD[T]HHmmss") +
+                    ";BYDAY=" + weekParts, 
+                "SUMMARY:" + name,
+                "DESCRIPTION:" + name + " - " + fullName + "\\n" + professor,
+                "LOCATION:" + classLocation,
+                "TRANSP:OPAQUE",
+                "END:VEVENT"
+            ].join("\n");
+            icsOut += "\n" + classLine;
+        });
+        icsOut += "\nEND:VCALENDAR";
+        $("#resultDiv").append("<pre><code>"+icsOut+"</code></pre>");
+        alert(JSON.stringify(icsOut));
+
+        // returning false stops the page from refreshing.
+        return false;
+    }); 
+});
+</script>
+</body>
+</html>
+
