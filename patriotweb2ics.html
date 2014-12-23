@@ -21,10 +21,12 @@
             <h4>Patriotweb2ICS - by <a href="http://akshaykarthik.com">Akshay Karthik</a></h4>
             <p>This is a simple tool that I wrote for myself to automatically convert the patriotweb course-schedule table into something that google calendar understands.</p>
             <hr>
-            <p>Let's start with where you get the information from patriotweb.<p>
-            <p>After you log in to patriotweb, go to "Registration"</p>
-            <p>Go into "Student Schedule" and select the appropriate term</p>
-            <p>Copy all of the table except the last row<p>
+            <ol>
+            <li>Let's start with where you get the information from patriotweb.</li>
+            <li>After you log in to patriotweb, go to "Registration"</li>
+            <li>Go into "Student Schedule" and select the appropriate term</li>
+            <li>Copy all of the table except first and last rows</li>
+            </ol>
         </div>
     </div>
     <form id="inputFromPW">
@@ -35,9 +37,31 @@
         </div>
     </form>
     <div class="row column" id="resultDiv"></div>
+    <div class="row">
+        <div class="column">
+            <ol start="5">
+                <li> Import your calendar into your calendar application of choice:
+                <br>
+                <a href="https://support.google.com/calendar/answer/37118?hl=en"> Google Calendar </a>
+                <br>
+                <a href="http://www2.le.ac.uk/offices/itservices/ithelp/my-computer/programs/office/outlook/calendar/icalendar"> Outlook </a>
+
+                <br>
+                <a href="http://support.apple.com/en-us/HT202338"> iCalendar </a>
+                </li>
+            </ol>
 </div>
 <script>
 $(document).ready(function(){
+    var replaceMap = {
+        "M": ["MO", "Monday"],
+        "T": ["TU", "Tuesday"],
+        "W": ["WE", "Wednesday"],
+        "R": ["TH", "Thursday"],
+        "F": ["FR", "Friday"],
+        "S": ["SA", "Saturday"]
+    };
+
     $("#inputFromPW").submit(function(event){
         var icsOut = ""+
             "BEGIN:VCALENDAR\n" +
@@ -51,6 +75,8 @@ $(document).ready(function(){
         lines.forEach(function(classLine){
             var classLineParts = classLine.split("\t");
             if(classLineParts.length < 12){
+                // ignore invalid lines
+                // ideally there should be some error handling but w/e
                 return;
             }
             
@@ -66,35 +92,62 @@ $(document).ready(function(){
             var professor = classLineParts[11];
 
             // convert from one to two character segments
-            var replaceMap = {
-                "M": "MO",
-                "T": "TU",
-                "W": "WE",
-                "R": "TH",
-                "F": "FR", "S": "SA"
-            };
             var weekParts = classLineParts[8].split("").map(function(item){
-              return replaceMap[item];  
+              return replaceMap[item][0];  
             }).join(",");
 
+            var formalWeekParts = classLineParts[8].split("").map(function(item){
+              return replaceMap[item][1];  
+            });
             // need to be very careful handling dates
             var startDateString = (classLineParts[6]);
             var endDateString = (classLineParts[7]);
 
             // the replication here should ideally be split up but it personally
             // helps me keep track of everything in my head
-            var startTime = startDateString + " " + classLineParts[9].split("-")[0].trim();
-            var endTime = startDateString + " " + classLineParts[9].split("-")[1].trim();
-            var repeatEndTime = endDateString + " " + classLineParts[9].split("-")[1].trim(); 
+            var classTimeSplit = classLineParts[9].split("-");
+            var startTime = startDateString + " " + classTimeSplit[0].trim();
+            // ics is weird because end-time referes to the end of the first event
+            // repeatEndTime refers to the end of the repeating event
+            var endTime = startDateString + " " + classTimeSplit[1].trim();
+            var repeatEndTime = endDateString + " " + classTimeSplit[1].trim(); 
+
             var startDateMoment = moment(startTime, "MMM D, YYYY h:mm a");
+            
+            // the first day needs to be offset to the first actual day of class
+            // what i'm doing is looking for the first day of the week of the class
+            // after the start of the semester and setting that as the first day of class 
+            var currentMin = startDateMoment.day(formalWeekParts[0]);
+            formalWeekParts.forEach(function(weekPart){
+                var weekMoment = startDateMoment.day(weekPart);
+                if((weekMoment.isAfter(startDateMoment) || weekMoment.isSame(startDateMoment))
+                    && weekMoment.isBefore(currentMin)){
+                    currentMin = weekMoment;
+                }
+            });
+            startDateMoment = currentMin;
+            
+            // this repetition is horrible and should be replaced with a function
+            // the problem is that i don't know if it's worth the overhead.
+            // TODO: refactor this structure
             var endDateMoment = moment(endTime, "MMM D, YYYY h:mm a");
+            var currentMin = endDateMoment.day(formalWeekParts[0]);
+            formalWeekParts.forEach(function(weekPart){
+                var weekMoment = endDateMoment.day(weekPart);
+                if((weekMoment.isAfter(endDateMoment) || weekMoment.isSame(endDateMoment))
+                    && weekMoment.isBefore(currentMin)){
+                    currentMin = weekMoment;
+                }
+            });
+            endDateMoment = currentMin;
+
             var endRepeatMoment = moment(repeatEndTime, "MMM D, YYYY h:mm a");
 
             var classLine = [
                 "BEGIN:VEVENT",
                 "UID:" + crn,
-                "DTSTART;VALUE=DATE:" + startDateMoment.format("YYYYMMDD[T]HHmmss"),
-                "DTEND;VALUE=DATE:" + endDateMoment.format("YYYYMMDD[T]HHmmss"),
+                "DTSTART;VALUE=DATE-TIME:" + startDateMoment.format("YYYYMMDD[T]HHmmss"),
+                "DTEND;VALUE=DATE-TIME:" + endDateMoment.format("YYYYMMDD[T]HHmmss"),
                 "RRULE:FREQ=WEEKLY;UNTIL=" + endRepeatMoment.format("YYYYMMDD[T]HHmmss") +
                     ";BYDAY=" + weekParts, 
                 "SUMMARY:" + name,
@@ -106,10 +159,11 @@ $(document).ready(function(){
             icsOut += "\n" + classLine;
         });
         icsOut += "\nEND:VCALENDAR";
-        $("#resultDiv").append("<pre><code>"+icsOut+"</code></pre>");
-        alert(JSON.stringify(icsOut));
+        //$("#resultDiv").append("<pre><code>"+icsOut+"</code></pre>");
+        // alert(JSON.stringify(icsOut));dd
 
         // returning false stops the page from refreshing.
+        window.open("data:text/calendar; charset=utf-8," + encodeURIComponent(icsOut));
         return false;
     }); 
 });
