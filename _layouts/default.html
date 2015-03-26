@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include head.html %}
+
+<body>
+
+<div class="container content">
+  {% if page.title != "Home" %}
+    <header class="masthead">
+        <h3 class="masthead-title">
+            <a href="{{ site.baseurl }}" title="Home">{{ site.title }}</a>
+            <small>{{ site.tagline }} </small> |
+            <small><a href="{{ site.baseurl }}pages/tools"> tools </a></small>
+            <small><a href="{{ site.baseurl }}blog"> blog </a></small>
+        </h3>    
+    </header>
+  {% endif %}
+
+    <main>
+    {{ content }}
+    </main>
+
+  {% if page.title != "Home" %}
+    <footer class="footer">
+        <small>
+            &copy; <time datetime="{{ site.time | date_to_xmlschema }}">{{ site.time | date: '%Y' }}</time>. All rights reserved.
+        </small>
+        <small> Built on top of <a href="https://github.com/poole/poole">poole</a> for jekyll.</small>
+    </footer>
+  {% endif %}
+</div>
+
+</body>
+</html>
