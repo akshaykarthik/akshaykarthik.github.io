@@ -6,21 +6,10 @@
  */
 
 import React from "react";
-import { useStaticQuery, graphql } from "gatsby";
 import { Font, GlobalStyles } from "../utils/typography"
 
 
 const Layout = ({ style = {}, children }) => {
-    const data = useStaticQuery(graphql`
-        query SiteTitleQuery {
-            site {
-                siteMetadata {
-                    title
-                }
-            }
-        }
-    `);
-
     return (
         <>
             <GlobalStyles />
