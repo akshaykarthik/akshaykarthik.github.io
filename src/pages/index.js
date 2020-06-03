@@ -1,10 +1,12 @@
 import React from "react";
-
-import Layout from "../components/layout";
-import SEO from "../components/seo";
-import * as colors from "../utils/colors";
 import { useStaticQuery, graphql, Link } from "gatsby";
 import styled, { css } from "styled-components";
+
+import { Layout } from "../components/layout";
+import { SEO } from "../components/seo";
+import * as colors from "../utils/colors";
+import { commonYearFormat } from "../utils/dates";
+
 
 const linkStyle = css`
     &:link,
@@ -40,6 +42,22 @@ const indexPageQuery = graphql`
         file(name: { eq: "akarthik_resume" }) {
             publicURL
         }
+        allMarkdownRemark(
+            filter: { fields: { sourceInstanceName: { eq: "blog" } } }
+            sort: { fields: fields___date, order: DESC }
+        ) {
+            edges {
+                node {
+                    fields {
+                        slug
+                        date
+                    }
+                    frontmatter {
+                        title
+                    }
+                }
+            }
+        }
     }
 `;
 
@@ -69,6 +87,16 @@ const IndexPage = () => {
             <ExternalLink href={data.file.publicURL}>
                 <h2>resume</h2>
             </ExternalLink>
+            <h2>blog posts</h2>
+            {data.allMarkdownRemark.edges.map(({ node }) => {
+                return (
+                <a href={node.fields.slug}>
+                    <h3>
+                        {commonYearFormat.format(new Date(node.fields.date))}  - {node.frontmatter.title}
+                    </h3>
+                </a>
+            )
+                })}
         </Layout>
     );
 };

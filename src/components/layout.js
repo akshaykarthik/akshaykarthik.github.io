@@ -8,7 +8,7 @@
 import React from "react";
 import { Font, GlobalStyles } from "../utils/typography";
 
-const Layout = ({ style = {}, children }) => {
+export const Layout = ({ style = {}, children }) => {
     return (
         <>
             <GlobalStyles />
@@ -26,5 +26,3 @@ const Layout = ({ style = {}, children }) => {
         </>
     );
 };
-
-export default Layout;

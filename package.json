@@ -29,7 +29,7 @@
     "react-typography": "^0.16.19",
     "styled-components": "^5.1.1",
     "typography": "^0.16.19",
-    "typography-theme-us-web-design-standards": "^0.16.19"
+    "typography-theme-github": "^0.16.19"
   },
   "devDependencies": {
     "gh-pages": "^3.0.0",

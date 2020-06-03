@@ -12,6 +12,14 @@ module.exports = {
                 path: `${__dirname}/src/assets`,
             },
         },
+        {
+            resolve: `gatsby-source-filesystem`,
+            options: {
+                name: `blog`,
+                path: `${__dirname}/src/posts`,
+            },
+        },
+
 
         "gatsby-plugin-styled-components",
         `gatsby-plugin-react-helmet`,
@@ -41,3 +49,4 @@ module.exports = {
         // `gatsby-plugin-offline`,
     ],
 };
+
