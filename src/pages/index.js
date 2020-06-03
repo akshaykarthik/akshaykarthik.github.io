@@ -66,7 +66,9 @@ const IndexPage = () => {
             <ExternalLink href="mailto:akshay.karthik@gmail.com">
                 <h2>email</h2>
             </ExternalLink>
-            <ExternalLink href={data.file.publicURL}><h2>resume</h2></ExternalLink>
+            <ExternalLink href={data.file.publicURL}>
+                <h2>resume</h2>
+            </ExternalLink>
         </Layout>
     );
 };

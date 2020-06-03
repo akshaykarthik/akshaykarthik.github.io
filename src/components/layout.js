@@ -6,8 +6,7 @@
  */
 
 import React from "react";
-import { Font, GlobalStyles } from "../utils/typography"
-
+import { Font, GlobalStyles } from "../utils/typography";
 
 const Layout = ({ style = {}, children }) => {
     return (
@@ -19,7 +18,7 @@ const Layout = ({ style = {}, children }) => {
                     margin: `0 auto`,
                     maxWidth: 960,
                     padding: `1rem 1.0875rem 1.45rem`,
-                    ...style
+                    ...style,
                 }}
             >
                 <main>{children}</main>

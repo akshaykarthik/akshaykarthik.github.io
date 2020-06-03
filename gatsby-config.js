@@ -13,8 +13,6 @@ module.exports = {
             },
         },
 
-
- 
         "gatsby-plugin-styled-components",
         `gatsby-plugin-react-helmet`,
 
@@ -35,11 +33,7 @@ module.exports = {
         {
             resolve: `gatsby-transformer-remark`,
             options: {
-                plugins: [
-                    "gatsby-remark-autolink-headers",
-                    "gatsby-remark-vscode",
-                    "gatsby-remark-katex"
-                ],
+                plugins: ["gatsby-remark-autolink-headers", "gatsby-remark-vscode", "gatsby-remark-katex"],
             },
         },
         // this (optional) plugin enables Progressive Web App + Offline functionality
