@@ -7,7 +7,6 @@ import { SEO } from "../components/seo";
 import * as colors from "../utils/colors";
 import { commonYearFormat } from "../utils/dates";
 
-
 const linkStyle = css`
     &:link,
     &:visited {
@@ -63,7 +62,6 @@ const indexPageQuery = graphql`
 
 const IndexPage = () => {
     const data = useStaticQuery(indexPageQuery);
-    console.log(data);
 
     return (
         <Layout
@@ -90,13 +88,13 @@ const IndexPage = () => {
             <h2>blog posts</h2>
             {data.allMarkdownRemark.edges.map(({ node }) => {
                 return (
-                <a href={node.fields.slug}>
-                    <h3>
-                        {commonYearFormat.format(new Date(node.fields.date))}  - {node.frontmatter.title}
-                    </h3>
-                </a>
-            )
-                })}
+                    <a href={node.fields.slug}>
+                        <h3>
+                            {commonYearFormat.format(new Date(node.fields.date))} - {node.frontmatter.title}
+                        </h3>
+                    </a>
+                );
+            })}
         </Layout>
     );
 };

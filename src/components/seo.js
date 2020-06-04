@@ -68,4 +68,3 @@ SEO.propTypes = {
     meta: PropTypes.arrayOf(PropTypes.object),
     title: PropTypes.string.isRequired,
 };
-

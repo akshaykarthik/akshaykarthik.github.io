@@ -10,12 +10,12 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
 
         let slug = permalink;
         const parent = getNode(node.parent);
-        if (parent.internal.type === 'File') {
+        if (parent.internal.type === "File") {
             createNodeField({
                 name: "sourceInstanceName",
                 node,
-                value: parent.sourceInstanceName
-            })
+                value: parent.sourceInstanceName,
+            });
         }
 
         if (!slug) {
